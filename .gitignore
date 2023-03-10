@@ -73,3 +73,6 @@ ENV/
 
 # Tox
 .tox
+
+# OS
+.DS_Store

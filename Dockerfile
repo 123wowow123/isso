@@ -80,7 +80,7 @@ RUN mkdir /db /config && chmod 1777 /db /config
 # Configuration
 VOLUME /db /config
 EXPOSE 8080
-ENV ISSO_SETTINGS /config/isso.cfg
+# ENV ISSO_SETTINGS /config/isso.cfg
 
 # Run Isso via gunicorn WSGI server
 ENTRYPOINT ["/isso/bin/gunicorn", "-b", "0.0.0.0:8080", "-w", "4", "--preload", "--worker-tmp-dir", "/dev/shm"]

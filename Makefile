@@ -7,6 +7,12 @@
 # Javascript frontend client:
 #   make init
 
+# Cloud Build Variables
+EXTERNAL_PORT := 8080
+GPROJECT_ID := chronopin-209507
+GRELEASE := latest
+
+# Original Variables
 ISSO_JS_SRC := $(shell find isso/js/app -type f) \
 	       $(shell ls isso/js/*.js | grep -vE "(min|dev)")
 
@@ -94,6 +100,9 @@ test: $($ISSO_PY_SRC)
 
 docker:
 	DOCKER_BUILDKIT=1 docker build -t isso:latest .
+
+grefresh:
+	gcloud builds submit --region=us-west2 --config cloudbuild.yaml
 
 docker-run:
 	docker run -d --rm --name isso -p 127.0.0.1:8080:8080 --mount type=bind,source=$(PWD)/contrib/isso-dev.cfg,target=/config/isso.cfg,readonly isso:latest isso.run
