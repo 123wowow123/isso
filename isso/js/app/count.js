@@ -6,14 +6,14 @@ module.exports = function () {
 
     var objs = {};
 
-    $.each("a", function(el) {
-        if (! el.href.match || ! el.href.match(/#isso-thread$/)) {
+    $.each("a", function (el) {
+        if (!(el.getAttribute("data-isso-id") || (el.href.match && el.href.match(/#isso-thread$/)))) {
             return;
         }
 
         var tid = el.getAttribute("data-isso-id") ||
-                  el.href.match(/^(.+)#isso-thread$/)[1]
-                         .replace(/^.*\/\/[^\/]+/, '');
+            el.href.match(/^(.+)#isso-thread$/)[1]
+                .replace(/^.*\/\/[^\/]+/, '');
 
         if (tid in objs) {
             objs[tid].push(el);
@@ -25,7 +25,7 @@ module.exports = function () {
     var urls = Object.keys(objs);
 
     if (urls.length > 0) {
-        api.count(urls).then(function(rv) {
+        api.count(urls).then(function (rv) {
             for (var key in objs) {
                 if (objs.hasOwnProperty(key)) {
 
@@ -33,6 +33,7 @@ module.exports = function () {
 
                     for (var i = 0; i < objs[key].length; i++) {
                         objs[key][i].textContent = i18n.pluralize("num-comments", rv[index]);
+                        objs[key][i].dataset.numComments = rv[index];
                     }
                 }
             }
