@@ -32,7 +32,7 @@ module.exports = function () {
                     var index = urls.indexOf(key);
 
                     for (var i = 0; i < objs[key].length; i++) {
-                        objs[key][i].textContent = i18n.pluralize("num-comments", rv[index]);
+                        objs[key][i].innerHTML = `<span class="num-comments">${i18n.pluralize("num-comments", rv[index])}</span>`;
                         objs[key][i].dataset.numComments = rv[index];
                     }
                 }
