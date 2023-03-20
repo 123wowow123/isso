@@ -16,10 +16,18 @@ var Postbox = function(parent) {
     var localStorage = utils.localStorageImpl,
         isso_thread = $('#isso-thread');
 
-    var dataAttributeValues = {
-        "author": isso_thread.getAttribute("data-isso-author"),
-        "email": isso_thread.getAttribute("data-isso-email"),
-        "website": isso_thread.getAttribute("data-isso-website")
+    var show_postbox = isso_thread && isso_thread.getAttribute("data-isso-postbox");
+    if(show_postbox === "false") {
+        return {};
+    }
+
+    var dataAttributes = {
+        "has_author": isso_thread && isso_thread.hasAttribute("data-isso-author"),
+        "author": isso_thread && isso_thread.getAttribute("data-isso-author"),
+        "has_email": isso_thread && isso_thread.hasAttribute("data-isso-email"),
+        "email": isso_thread && isso_thread.getAttribute("data-isso-email"),
+        "has_website": isso_thread && isso_thread.hasAttribute("data-isso-website"),
+        "website": isso_thread && isso_thread.getAttribute("data-isso-website"),
     };
 
     var localStorageValues = {
@@ -29,9 +37,9 @@ var Postbox = function(parent) {
     };
 
     var el = $.htmlify(template.render("postbox", {
-        "author": localStorageValues[author] || dataAttributeValues[author],
-        "email": localStorageValues[email] || dataAttributeValues[email],
-        "website": localStorageValues[website] || dataAttributeValues[website],
+        "author": dataAttributes["has_author"] ? dataAttributes['author'] : localStorageValues['author'],
+        "email": dataAttributes["has_email"] ? dataAttributes['email'] : localStorageValues['email'],
+        "website": dataAttributes["has_website"] ? dataAttributes['website'] : localStorageValues['website'],
         "preview": ''
     }));
 
