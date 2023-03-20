@@ -14,10 +14,24 @@ var globals = require("app/globals");
 var Postbox = function(parent) {
 
     var localStorage = utils.localStorageImpl,
-        el = $.htmlify(template.render("postbox", {
-        "author":  JSON.parse(localStorage.getItem("isso-author")),
-        "email":   JSON.parse(localStorage.getItem("isso-email")),
-        "website": JSON.parse(localStorage.getItem("isso-website")),
+        isso_thread = $('#isso-thread');
+
+    var dataAttributeValues = {
+        "author": isso_thread.getAttribute("data-isso-author"),
+        "email": isso_thread.getAttribute("data-isso-email"),
+        "website": isso_thread.getAttribute("data-isso-website")
+    };
+
+    var localStorageValues = {
+        "author": JSON.parse(localStorage.getItem("isso-author")),
+        "email": JSON.parse(localStorage.getItem("isso-email")),
+        "website": JSON.parse(localStorage.getItem("isso-website"))
+    };
+
+    var el = $.htmlify(template.render("postbox", {
+        "author": localStorageValues[author] || dataAttributeValues[author],
+        "email": localStorageValues[email] || dataAttributeValues[email],
+        "website": localStorageValues[website] || dataAttributeValues[website],
         "preview": ''
     }));
 
