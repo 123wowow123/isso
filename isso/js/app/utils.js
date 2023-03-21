@@ -92,10 +92,15 @@ var wait_for = function() {
     };
 };
 
+var isTrue = function(value) {
+    return /^true$/i.test(value);
+}
+
 module.exports = {
     cookie: cookie,
     localStorageImpl: localStorageImpl,
     normalize_bcp47: normalize_bcp47,
     pad: pad,
     wait_for: wait_for,
+    isTrue: isTrue
 };

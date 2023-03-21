@@ -8,6 +8,7 @@ var template = require("app/template");
 var i18n = require("app/i18n");
 var identicons = require("app/lib/identicons");
 var globals = require("app/globals");
+var getThreadConfig = require("app/getThreadConfig");
 
 "use strict";
 
@@ -16,19 +17,12 @@ var Postbox = function(parent) {
     var localStorage = utils.localStorageImpl,
         isso_thread = $('#isso-thread');
 
-    var show_postbox = isso_thread && isso_thread.getAttribute("data-isso-postbox");
-    if(show_postbox === "false") {
+    var show_postbox = isso_thread && utils.isTrue(isso_thread.getAttribute("data-isso-postbox"));
+    if(!show_postbox) {
         return {};
     }
 
-    var dataAttributes = {
-        "has_author": isso_thread && isso_thread.hasAttribute("data-isso-author"),
-        "author": isso_thread && isso_thread.getAttribute("data-isso-author"),
-        "has_email": isso_thread && isso_thread.hasAttribute("data-isso-email"),
-        "email": isso_thread && isso_thread.getAttribute("data-isso-email"),
-        "has_website": isso_thread && isso_thread.hasAttribute("data-isso-website"),
-        "website": isso_thread && isso_thread.getAttribute("data-isso-website"),
-    };
+    var threadConfig = getThreadConfig();
 
     var localStorageValues = {
         "author": JSON.parse(localStorage.getItem("isso-author")),
@@ -37,9 +31,11 @@ var Postbox = function(parent) {
     };
 
     var el = $.htmlify(template.render("postbox", {
-        "author": dataAttributes["has_author"] ? dataAttributes['author'] : localStorageValues['author'],
-        "email": dataAttributes["has_email"] ? dataAttributes['email'] : localStorageValues['email'],
-        "website": dataAttributes["has_website"] ? dataAttributes['website'] : localStorageValues['website'],
+        "author": threadConfig["has_author"] ? threadConfig['author'] : localStorageValues['author'],
+        "email": threadConfig["has_email"] ? threadConfig['email'] : localStorageValues['email'],
+        "website": threadConfig["has_website"] ? threadConfig['website'] : localStorageValues['website'],
+        "vote": threadConfig["has_vote"] ? threadConfig['vote'] : undefined,
+        "modify": threadConfig["has_modify"] ? threadConfig['modify'] : undefined,
         "preview": ''
     }));
 
@@ -224,7 +220,8 @@ var insert = function(comment, scrollIntoView) {
         text   = $("#isso-" + comment.id + " > .isso-text-wrapper > .isso-text");
 
     var form = null;  // XXX: probably a good place for a closure
-    $("a.isso-reply", footer).toggle("click",
+    var replyEl = $("a.isso-reply", footer);
+    replyEl && replyEl.toggle("click",
         function(toggler) {
             form = footer.insertAfter(new Postbox(comment.parent === null ? comment.id : comment.parent));
             form.onsuccess = function() { toggler.next(); };
@@ -237,7 +234,9 @@ var insert = function(comment, scrollIntoView) {
         }
     );
 
-    if (config.vote) {
+    var upVoteEl = $("a.isso-upvote", footer);
+    var downVoteEl = $("a.isso-downvote", footer);
+    if (upVoteEl && downVoteEl) {
         var voteLevels = config['vote-levels'];
         if (typeof voteLevels === 'string') {
             // Eg. -5,5,15
@@ -270,13 +269,13 @@ var insert = function(comment, scrollIntoView) {
             }
         };
 
-        $("a.isso-upvote", footer).on("click", function () {
+        upVoteEl.on("click", function () {
             api.like(comment.id).then(function (rv) {
                 votes(rv.likes - rv.dislikes);
             });
         });
 
-        $("a.isso-downvote", footer).on("click", function () {
+        downVoteEl.on("click", function () {
             api.dislike(comment.id).then(function (rv) {
                 votes(rv.likes - rv.dislikes);
             });
@@ -285,7 +284,8 @@ var insert = function(comment, scrollIntoView) {
         votes(comment.likes - comment.dislikes);
     }
 
-    $("a.isso-edit", footer).toggle("click",
+    var editEl = $("a.isso-edit", footer);
+    editEl && editEl.toggle("click",
         function(toggler) {
             var edit = $("a.isso-edit", footer);
             var avatar = config["avatar"] || config["gravatar"] ? $(".isso-avatar", el, false)[0] : null;
@@ -348,7 +348,8 @@ var insert = function(comment, scrollIntoView) {
         }
     );
 
-    $("a.isso-delete", footer).toggle("click",
+    var deleteEl = $("a.isso-delete", footer);
+    deleteEl && deleteEl.toggle("click",
         function(toggler) {
             var del = $("a.isso-delete", footer);
             var state = ! toggler.state;

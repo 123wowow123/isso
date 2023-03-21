@@ -14,6 +14,8 @@ var $ = require("app/dom");
 var svg = require("app/svg");
 var template = require("app/template");
 var utils = require("app/utils");
+var getThreadConfig = require("app/getThreadConfig");
+
 
 "use strict";
 
@@ -25,11 +27,18 @@ template.set("svg", svg);
 var isso_thread;
 var heading;
 var postbox;
+var threadConfig;
 
 // Track whether config has been fetched from server
 var config_fetched = utils.wait_for();
 
+function refreshThreadConfig() {
+    threadConfig = getThreadConfig();
+    template.set("thread", threadConfig);
+}
+
 function init() {
+    refreshThreadConfig();
     config_fetched.reset()
 
     // Decorate all <a> links that point to an #isso-thread with comment counts
